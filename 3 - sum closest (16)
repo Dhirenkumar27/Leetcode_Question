@@ -1,0 +1,95 @@
+Given an integer array nums of length n and an integer target, find three integers at distinct indices in nums such that the sum is closest to target.
+
+Return the sum of the three integers.
+
+You may assume that each input would have exactly one solution.
+
+Example 1:
+
+Input: nums = [-1,2,1,-4], target = 1
+Output: 2
+Explanation: The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
+Example 2:
+
+Input: nums = [0,0,0], target = 1
+Output: 0
+Explanation: The sum that is closest to the target is 0. (0 + 0 + 0 = 0).
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Socho ek dockyard hai. Subah-subah trucks line me khade hain aur ek truck ka driver bolta hai ki bhai mera truck maximum 150 kg utha sakta hai. Usse zyada hua to truck kharab ho sakta hai, aur kam hua to space waste ho jaayega. Company ka rule hai ki har truck me sirf 3 packages hi jayenge.
+
+Dockyard me packages pade hain jinke weight likhe hue hain:
+70 kg, 20 kg, 15 kg, 48 kg, 84 kg
+
+Ab supervisor ka kaam hai ki inme se 3 packages aise choose kare jo milke 150 kg ke jitne close ho sake.
+
+Agar wo simple tareeke se sochta, to wo bolega:
+“Chalo sab 3-3 ke group bana lete hain aur har group ka weight nikalte hain.”
+Matlab jaise:
+(70,20,15), (70,20,48), (70,20,84), (70,15,48)… aise sab.
+Phir har ek ka total nikaal ke dekhenge ki kaunsa 150 ke sabse paas hai.
+
+Ye tareeka chhoti list ke liye theek hai, lekin agar 200-300 packages aa gaye, to ye kaam din bhar bhi khatam nahi hoga. Company itna slow kaam afford nahi kar sakti.
+
+Tab supervisor ek smart trick use karta hai.
+Wo bolta hai: “Pehle saare packages ko weight ke order me laga do.”
+
+To list ban jaati hai:
+15, 20, 48, 70, 84
+
+Ab wo kaam thoda smart tareeke se karta hai.
+Wo ek package pakad leta hai, maan lo 15 kg, aur bolta hai:
+“Truck me total 150 jaana chahiye, to 15 rakh liya, ab baaki 135 kg mujhe do aur 2 packages se banana hai.”
+
+Ab wo bachi hui list me sabse halka aur sabse bhari package dekhta hai.
+20 aur 84 uthata hai → 104 banta hai, jo 135 se kam hai, to wo bolta hai “ye thoda halka hai, kuch heavy try karte hain” aur 20 ki jagah 48 le leta hai.
+48 + 84 = 132 → bahut close to 135.
+To ab total ho gaya 15 + 132 = 147, jo 150 ke kaafi paas hai.
+Wo isko note kar leta hai.
+
+Phir wo next heavy try karta hai, phir next light, is tarah bina sab combinations banaye hi usse pata chal jaata hai kaunsa best fit hai.
+
+Phir wo 15 ko side me rakh deta hai aur 20 se start karta hai, phir 48 se, phir 70 se… aur har baar isi tarah baaki do ko balance karke best combination dhundhta hai.
+
+Is tarah wo bina hazaaron combinations try kiye, truck ko almost perfect weight se bhar deta hai — na over, na under.
+
+Bas yahi cheez 3Sum Closest problem me hoti hai.
+Code me hum numbers ke saath kar rahe hote hain, aur real life me companies yahi kaam weight, budget, resources aur planning ke saath karti hain.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    public int threeSumClosest(int[] nums, int target) {
+        
+        Arrays.sort(nums); 
+        int n = nums.length;
+
+        int closestSum = nums[0] + nums[1] + nums[2]; 
+
+        for (int i = 0; i < n - 2; i++) {
+            int left = i + 1;
+            int right = n - 1;
+
+            while (left < right) {
+                int currentSum = nums[i] + nums[left] + nums[right];
+
+               
+                if (Math.abs(currentSum - target) < Math.abs(closestSum - target)) 
+                {
+                    closestSum = currentSum;
+                }
+
+                if (currentSum < target) {
+                    left++;     
+                }
+                else if (currentSum > target) {
+                    right--;   
+                } 
+                else {
+                    return currentSum;  
+                }
+            }
+        }
+        return closestSum;
+    }
+}
+
