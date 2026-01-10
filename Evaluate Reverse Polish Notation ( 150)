@@ -1,0 +1,89 @@
+You are given an array of strings tokens that represents an arithmetic expression in a Reverse Polish Notation.
+
+Evaluate the expression. Return an integer that represents the value of the expression.
+
+Note that:
+
+The valid operators are '+', '-', '*', and '/'.
+Each operand may be an integer or another expression.
+The division between two integers always truncates toward zero.
+There will not be any division by zero.
+The input represents a valid arithmetic expression in a reverse polish notation.
+The answer and all the intermediate calculations can be represented in a 32-bit integer.
+ 
+
+Example 1:
+
+Input: tokens = ["2","1","+","3","*"]
+Output: 9
+Explanation: ((2 + 1) * 3) = 9
+Example 2:
+
+Input: tokens = ["4","13","5","/","+"]
+Output: 6
+Explanation: (4 + (13 / 5)) = 6
+Example 3:
+
+Input: tokens = ["10","6","9","3","+","-11","*","/","*","17","+","5","+"]
+Output: 22
+Explanation: ((10 * (6 / ((9 + 3) * -11))) + 17) + 5
+= ((10 * (6 / (12 * -11))) + 17) + 5
+= ((10 * (6 / -132)) + 17) + 5
+= ((10 * 0) + 17) + 5
+= (0 + 17) + 5
+= 17 + 5
+= 22
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+upar jo question hai dikhne me bahut simple lagta hai, bas normal addition, subtraction, multiplication aur division karni hoti hai. lekin jo input hame milta hai wo normal maths 
+jaisa nahi hota, wo postfix (Reverse Polish Notation) me hota hai. ye koi random format nahi hai, balki exactly wahi format hai jisme computer, compiler aur mobile calculator 
+internally kaam karte hain. reason simple hai — is format me calculation karna computer ke liye sabse easy hota hai. computer ko bas ek hi cheez samajh aati hai: number ko push 
+karo, phir jab operation aaye to upar ke do number pop karo, un par operation perform karo, aur result wapas push karo. bas ye chaar step follow hote hain aur pura calculation
+ho jata hai.
+
+ab socho ek simple expression hai (3 + 6 * 10). hume pata hai BODMAS rule ke hisaab se pehle multiplication hoti hai, isliye answer 63 aata hai. lekin computer ko BODMAS nahi pata hota.
+computer brackets, priority aur rules nahi samajhta, use bas itna pata hota hai ki do numbers aur ek operator mila to wo result de sakta hai. isliye jab hum calculator ya koi program
+me (3 + 6 * 10) likhte hain, to wo internally isko convert kar deta hai 3 6 10 * + me. is form me koi confusion nahi hota, pehle 6 10 * hoga, phir uska result 3 ke saath add hoga.
+ye exactly wahi cheez hai jo is question me diya gaya hai.
+
+isliye is problem ko solve karne ke liye hum bhi wahi approach use karte hain jo computer karta hai — ek stack. jaise hi koi number aata hai, hum usko stack me push kar dete hain. 
+jaise hi koi operator aata hai, hum stack se do number pop karte hain, operation karte hain, aur result wapas stack me push kar dete hain. jab saare tokens process ho jate hain, 
+stack me jo ek value bachi hoti hai wahi final answer hota hai. ye logic real world ke calculator aur compiler ke bilkul same hai, isliye ye approach sabse natural aur easy hoti hai.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    public int evalRPN(String[] tokens) {
+        Stack<Integer> stack = new Stack<>();
+
+        for (String token : tokens) {
+            if (isOperator(token)) {
+                int a = stack.pop();  
+                int b = stack.pop();   
+
+                int result = 0;
+                switch (token) {
+                    case "+":
+                        result = b + a;
+                        break;
+                    case "-":
+                        result = b - a;
+                        break;
+                    case "*":
+                        result = b * a;
+                        break;
+                    case "/":
+                        result = b / a;   
+                        break;
+                }
+                stack.push(result);
+            } else {
+                stack.push(Integer.parseInt(token));
+            }
+        }
+        return stack.pop();
+    }
+
+    private boolean isOperator(String s) {
+        return s.equals("+") || s.equals("-") || s.equals("*") || s.equals("/");
+    }
+}
