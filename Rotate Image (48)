@@ -1,0 +1,185 @@
+You are given an n x n 2D matrix representing an image, rotate the image by 90 degrees (clockwise).
+
+You have to rotate the image in-place, which means you have to modify the input 2D matrix directly. DO NOT allocate another 2D matrix and do the rotation.
+
+Example 1:
+Input: matrix = [[1,2,3],[4,5,6],[7,8,9]]
+Output: [[7,4,1],[8,5,2],[9,6,3]]
+
+Example 2:
+Input: matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]
+Output: [[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]
+
+Constraints:
+n == matrix.length == matrix[i].length
+1 <= n <= 20
+-1000 <= matrix[i][j] <= 1000
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ye jo question hai, wo sirf DSA ya LeetCode ka question nahi hai.
+Hum isse real life me roz use karte hain, bas waha numbers nahi hote — waha images, videos aur screens hoti hain.
+
+Jab hum apna phone portrait se landscape karte hain, ya video ko seedha karte hain, ya Instagram reel ko ghumate hain  waha background me koi matrix nahi dikhta, par 
+internally sab kuch matrix hi hota hai.
+
+Ek image asal me hoti hai:
+
+pixels ki 2D matrix
+
+
+Har pixel ek number hota hai (color value).
+Jab hum image ko 90° rotate karte hain, to asal me hum us matrix ko rotate kar rahe hote hain.
+
+Kabhi-kabhi phone ko ulta kar dete hain — wo 180° rotation hota hai.
+Kabhi camera ko aur ghuma dete hain — wo 270° hota hai.
+
+Angle hamesha 90 hi nahi hota, kabhi 32°, 45° bhi ho sakta hai,
+lekin agar hum 90° ka logic samajh gaye, to baaki angles nikalna easy ho jaata hai.
+
+
+## Ab matrix ko haath me leke sochte hain
+
+Maan lo hamare paas ek 3 × 3 matrix hai
+(3 rows, 3 columns)
+
+
+1  2  3
+4  5  6
+7  8  9
+
+
+Isko hume 90° clockwise ghumana hai.
+
+
+
+## Step 1 — Transpose
+
+Transpose hum 10th class se jaante hain 😄
+Row ko column bana do, column ko row.
+
+Transpose ke baad:
+
+
+1  4  7
+2  5  8
+3  6  9
+
+
+Yaha bas itna hua:
+
+> matrix[i][j] → matrix[j][i]
+
+
+
+ Step 2 — Reverse Rows (sirf rows)
+
+Ab hum har row ko ulta kar dete hain:
+
+1  4  7   →   7  4  1
+2  5  8   →   8  5  2
+3  6  9   →   9  6  3
+
+
+Final:
+
+7  4  1
+8  5  2
+9  6  3
+
+
+Yahi hai 90° clockwise rotation.
+
+So formula ho gaya:
+
+>Transpose + Reverse each row
+
+
+270° rotation (90° anti-clockwise)
+
+Bas ek chhota sa twist.
+
+Transpose same rahega,
+lekin is baar hum rows nahi, columns value reverse karenge.
+
+Transpose:
+
+
+1  4  7
+2  5  8
+3  6  9
+
+
+Columns value reverse:
+
+3  6  9
+2  5  8
+1  4  7
+
+Ye hai 270° clockwise (ya 90° anti-clockwise)
+
+So rule:
+
+> Transpose + Reverse columns
+
+180° rotation — new trick 🔥
+
+Ye mera favourite part hai.
+
+180° ka matlab:
+
+> image ko bilkul ulta kar dena
+
+Isme transpose ki bhi zarurat nahi hoti.
+
+Bas ye karo:
+
+ Rows reverse karo
+ Fir columns reverse karo
+
+Ya ek line me:
+
+matrix[i][j] ↔ matrix[n-1-i][n-1-j]
+
+Example:
+
+
+1 2 3      9 8 7
+4 5 6  →   6 5 4
+7 8 9      3 2 1
+
+Ye hota hai 180° rotation.
+
+Aur haan, theoretically tum 90° ko do baar call karke bhi 180° bana sakte ho,
+aur 90° ko teen baar call karke 270° 😂
+lekin corporate me hum aisa nahi karte — waha optimized solution chahiye.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Below code for 90 degree clockwise rotation
+
+class Solution {
+    public void rotate(int[][] matrix) {
+        int n = matrix.length;
+
+        // Step 1: Transpose
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = temp;
+            }
+        }
+
+        // Step 2: Reverse each row
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n / 2; j++) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[i][n - j - 1];
+                matrix[i][n - j - 1] = temp;
+            }
+        }
+
+    }
+}
+
+
+
