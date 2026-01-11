@@ -1,0 +1,89 @@
+200. Number of Islands
+Medium
+Topics
+premium lock icon
+Companies
+Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water), return the number of islands.
+
+An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+
+ 
+
+Example 1:
+
+Input: grid = [
+  ["1","1","1","1","0"],
+  ["1","1","0","1","0"],
+  ["1","1","0","0","0"],
+  ["0","0","0","0","0"]
+]
+Output: 1
+Example 2:
+
+Input: grid = [
+  ["1","1","0","0","0"],
+  ["1","1","0","0","0"],
+  ["0","0","1","0","0"],
+  ["0","0","0","1","1"]
+]
+Output: 3
+ -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+upar jo problem hai iska real life me bahut use hota hai. hum ise bahut jagah use karte hain. unme se ek important jagah medical field hai, jaise CT scan aur MRI machine.
+jab kisi insaan ke brain me tumor hota hai, to doctor CT scan ya MRI se uska scan karwata hai. machine jo image banati hai, wo actually computer ke liye ek grid ki tarah hoti hai.
+har chhota part ek cell hota hai. kuch cells normal hote hain aur kuch cells me tumor hota hai. maan lo tumor wale cells ko hum ‘1’ maan lete hain aur normal ko ‘0’.
+ab doctor ka real sawal yeh hota hai ki kya brain me sirf ek hi bada tumor hai ya kai alag-alag chhote-chhote tumor hain. yahin par Number of Islands wala logic use hota hai.
+jaise problem me hum dekhte hain ki kaun-kaun se ‘1’ aapas me connected hain. jo ‘1’ upar-neeche ya left-right se jude hote hain, wo ek hi island banate hain. waise hi CT scan
+me jo tumor wale pixels aapas me connected hote hain, wo ek hi tumor region hota hai. agar kahi alag jagah par connected pixels ka ek aur group mil jaye, to wo ek naya tumor hota hai.
+
+ab isko solve kaise karte hain, wo bhi simple hai. jaise hum land aur water wale grid me sochte hain ki kaunsa land connected hai aur kaunsa alag, waise hi yahan hum image ke grid
+me dekhte hain ki kaunsa tumor pixel connected hai. ek important condition hoti hai ki connection sirf horizontal aur vertical direction me maana jata hai, diagonal me nahi. 
+ye bilkul problem ke rule jaisa hi hai.
+
+technical language me bolein to ye pura grid ek graph ki tarah hota hai, jahan har cell ek node hai aur uske upar-neeche-left-right wale cells uske neighbors hote hain.
+jab bhi hume koi naya ‘1’ milta hai jo pehle visit nahi hua, hum wahan se DFS ya BFS lagate hain. DFS ya BFS us poore connected area ko ghoom kar mark kar deta hai. 
+iska matlab ek poora tumor region ya ek poora island mil gaya.
+
+har baar jab DFS ya BFS nayi jagah se start hota hai, hume ek naya island ya naya tumor milta hai. isi tarah total DFS starts hi batate hain ki kitne alag-alag tumor hain ya
+kitne islands hain.
+
+isliye yeh problem sirf coding ka question nahi hai, balki real life me doctors, machines aur analysis systems isi logic ka use karke important decisions lete hain.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+
+    public void dfs(int i, int j, boolean[][] visited, char[][] grid, int m, int n) {
+        // Base cases
+        if (i < 0 || j < 0 || i >= m || j >= n || grid[i][j] == '0' || visited[i][j]) return;     
+       
+        // Mark current cell visited
+        visited[i][j] = true;
+
+        // Explore neighbors
+        dfs(i - 1, j, visited, grid, m, n); // up
+        dfs(i + 1, j, visited, grid, m, n); // down
+        dfs(i, j - 1, visited, grid, m, n); // left
+        dfs(i, j + 1, visited, grid, m, n); // right
+    }
+
+    public int numIslands(char[][] grid) {
+        if (grid == null || grid.length == 0) return 0;
+
+        int m = grid.length;       // rows
+        int n = grid[0].length;    // columns
+
+        boolean[][] visited = new boolean[m][n];
+        int islands = 0;
+
+    
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == '1' && !visited[i][j]) {
+                    dfs(i, j, visited, grid, m, n);
+                    islands++;  
+                }
+            }
+        }
+
+        return islands;
+    }
+}
