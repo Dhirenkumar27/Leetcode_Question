@@ -1,0 +1,145 @@
+Given a triangle array, return the minimum path sum from top to bottom.
+
+For each step, you may move to an adjacent number of the row below. More formally, if you are on index i on the current row, you may move to either index i or index i + 1 on the next row.
+
+Example 1:
+
+Input: triangle = [[2],[3,4],[6,5,7],[4,1,8,3]]
+Output: 11
+Explanation: The triangle looks like:
+   2
+  3 4
+ 6 5 7
+4 1 8 3
+The minimum path sum from top to bottom is 2 + 3 + 5 + 1 = 11 (underlined above).
+Example 2:
+
+Input: triangle = [[-10]]
+Output: -10
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Data Center me Network Routing
+
+Ek badi software company ka Data Center hai.
+Is data center me data upar wale Main Server se neeche ke User Servers tak bheja jaata hai.
+
+Network ka structure kuch is tarah bana hai:
+
+           2
+        3       4
+     6      5      7
+   4     1      8     3
+
+
+Har number ek network node hai aur uska number batata hai ki
+us node se data bhejne ka latency cost (delay) kitna hai.
+
+Rule:
+Agar data kisi node (row, col) par hai, to woh sirf:
+
+(row+1, col) ya
+
+(row+1, col+1)
+par ja sakta hai.
+
+Goal:
+
+Main Server se kisi ek User Server tak data ko minimum total latency ke saath bhejna.
+
+🚨 Engineer ki galti (Greedy approach)
+
+Ek junior engineer sochta hai:
+
+“Har step par jahan latency kam dikhe, udhar data bhej dete hain.”
+
+Main Server se:
+
+3 < 4 → 3 choose kiya
+
+5 < 6 → 5 choose kiya
+
+1 < 8 → 1 choose kiya
+
+Is route ka total:
+
+2 + 3 + 5 + 1 = 11
+
+
+Yeh is example me sahi nikla —
+lekin real systems me yeh approach fail hota hai, kyunki kabhi kabhi aaj ka chhota delay aage jaakar bahut bada ban jata hai.
+
+like example lete hai 
+    1
+  2    3
+100  100  1
+
+abhi ham greedy approach se jate to kya route hota hamara : 1 --> 2 --> 100 = 103  (cost is not minimum)
+but the minimum path is : 1 --> 3 --> 1 = 5
+this will acheive using below Dynamic programming approach
+
+Senior engineer alag tarike se sochta hai.
+wo bottom se aayega upper server tak.
+
+“Har node par khade hoke yeh mat socho ki agla node sasta hai ya nahi.
+Pehle yeh pata karo ki iss node se final server tak sabse sasta raasta kaunsa hai.”
+
+Isliye woh calculation bottom se start karta hai.
+
+Last row (User Servers):
+
+4   1   8   3
+
+
+Yeh already final latency hai.
+
+Ab ek row upar:
+
+6   5   7
+
+
+Har node ke liye:
+
+6 → min(4,1) = 1 → total = 7
+
+5 → min(1,8) = 1 → total = 6
+
+7 → min(8,3) = 3 → total = 10
+
+Ab yeh ban gaya:
+
+7   6   10
+
+
+Iska matlab:
+
+“Agar data 5 waale node par aaya, to yahan se final tak minimum delay 6 hoga.”
+
+Phir next row:
+
+3   4
+→ 9   10
+
+
+Top:
+
+2 + min(9,10) = 11
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    public int minimumTotal(List<List<Integer>> triangle) {
+        int n = triangle.size();
+        int[] dp = new int[n];
+
+        for(int i = 0; i<n ;i++)
+        {
+            dp[i] = triangle.get(n-1).get(i);
+        }
+
+        for(int row = n-2;row>=0;row--)
+        {
+            for(int col = 0;col<=row;col++)
+            {
+                dp[col] = triangle.get(row).get(col) + Math.min(dp[col],dp[col+1]);
+            }
+        }
+        return dp[0];
+    }
+}
