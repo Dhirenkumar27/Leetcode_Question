@@ -1,0 +1,70 @@
+Given an integer array nums, return all the different possible non-decreasing subsequences of the given array with at least two elements. You may return the answer in any order.
+
+ 
+
+Example 1:
+
+Input: nums = [4,6,7,7]
+Output: [[4,6],[4,6,7],[4,6,7,7],[4,7],[4,7,7],[6,7],[6,7,7],[7,7]]
+Example 2:
+
+Input: nums = [4,4,3,2,1]
+Output: [[4,4]]
+ 
+
+Constraints:
+
+1 <= nums.length <= 15
+-100 <= nums[i] <= 100
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Socho tumhare paas ek list hai jo time ke saath badhne wali cheez ko dikhati hai — jaise kisi student ke test marks:
+[4, 6, 7, 7]
+Ye marks order me hain, pehle test ka mark 4, phir 6, phir 7, phir 7. Ab tumhe in marks se har wo possible study-progress pattern nikalna hai jisme marks kabhi girte na ho
+(yaani same ya badhte rahein), aur jisme kam se kam 2 test ho. Tum kisi bhi test ko skip kar sakte ho, lekin order change nahi kar sakte. Iska matlab tum [4,6], [4,7], [6,7], [7,7] 
+jaise patterns bana sakte ho, lekin [6,4] ya [7,6] allowed nahi hain. Tumhara goal hai saare valid patterns nikalna, lekin duplicate patterns nahi chahiye, kyunki dono 7 same value
+ke hain aur unse banne wale patterns bhi same ho sakte hain.
+
+Ab solution ko isi story se samjho. Tum pehle test se shuru karte ho aur decide karte ho ki “kya main is mark ko apne pattern me loon ya skip kar doon?” Jab tum 4 lete ho, tum aage
+dekhte ho ki 6 fit hota hai ya nahi — hota hai, kyunki 6, 4 se chhota nahi hai. Phir 7 bhi fit hota hai, aur agla 7 bhi fit hota hai. Har baar jab tumhare paas 2 ya usse zyada marks
+ho jaate hain, tum us pattern ko answer list me likh lete ho. Jab ek raasta poora ho jaata hai (jaise [4,6,7,7]), tum peeche aate ho aur last mark hata kar doosra option try karte ho
+(jaise [4,6] se [4,7]). Is tarah tum har possible valid progress try karte ho.
+
+Duplicate se bachne ke liye, har level par tum apne aap se yeh yaad rakhte ho ki “is jagah par maine kaunsa mark already try kar liya hai.” Agar tum [4] se shuru karke ek 7 already
+try kar chuke ho, to doosra 7 use karke wahi [4,7] dobara banana koi naya pattern nahi dega — isliye use skip kar diya jaata hai. Ye kaam code me HashSet karta hai. Is poore process
+me tum ek tree ki tarah saare raaste explore karte ho, galat ya duplicate raaste chhod dete ho, aur sirf wahi sequences collect karte ho jisme marks kabhi kam nahi hote aur jo unique 
+hote hain.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    List<List<Integer>> result = new ArrayList<>();
+
+    public List<List<Integer>> findSubsequences(int[] nums) {
+        backtrack(nums, 0, new ArrayList<>());
+        return result;
+    }
+
+    private void backtrack(int[] nums, int index, List<Integer> path) {
+        if (path.size() >= 2) {
+            result.add(new ArrayList<>(path));
+        }
+
+        HashSet<Integer> used = new HashSet<>(); // important
+
+        for (int i = index; i < nums.length; i++) {
+
+            // condition 1: non-decreasing
+            if (path.size() > 0 && nums[i] < path.get(path.size() - 1))
+                continue;
+
+            // condition 2: avoid duplicates at same depth
+            if (used.contains(nums[i]))
+                continue;
+
+            used.add(nums[i]);
+
+            path.add(nums[i]);
+            backtrack(nums, i + 1, path);
+            path.remove(path.size() - 1);
+        }
+    }
+}
