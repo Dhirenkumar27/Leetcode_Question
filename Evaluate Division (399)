@@ -1,0 +1,126 @@
+You are given an array of variable pairs equations and an array of real numbers values, where equations[i] = [Ai, Bi] and values[i] represent the equation Ai / Bi = values[i]. Each Ai or Bi is a string that represents a single variable.
+
+You are also given some queries, where queries[j] = [Cj, Dj] represents the jth query where you must find the answer for Cj / Dj = ?.
+
+Return the answers to all queries. If a single answer cannot be determined, return -1.0.
+
+Note: The input is always valid. You may assume that evaluating the queries will not result in division by zero and that there is no contradiction.
+
+Note: The variables that do not occur in the list of equations are undefined, so the answer cannot be determined for them.
+
+ 
+
+Example 1:
+
+Input: equations = [["a","b"],["b","c"]], values = [2.0,3.0], queries = [["a","c"],["b","a"],["a","e"],["a","a"],["x","x"]]
+Output: [6.00000,0.50000,-1.00000,1.00000,-1.00000]
+Explanation: 
+Given: a / b = 2.0, b / c = 3.0
+queries are: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ? 
+return: [6.0, 0.5, -1.0, 1.0, -1.0 ]
+note: x is undefined => -1.0
+Example 2:
+
+Input: equations = [["a","b"],["b","c"],["bc","cd"]], values = [1.5,2.5,5.0], queries = [["a","c"],["c","b"],["bc","cd"],["cd","bc"]]
+Output: [3.75000,0.40000,5.00000,0.20000]
+Example 3:
+
+Input: equations = [["a","b"]], values = [0.5], queries = [["a","b"],["b","a"],["a","c"],["x","y"]]
+Output: [0.50000,2.00000,-1.00000,-1.00000]
+ ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+upar jo question hai wo dekhne me kaafi darawna lagta hai, lekin sach ye hai ki agar hum coding aur fancy words ko side me rakh dein, to ye problem 5th class ke bachche ki soch se 
+bhi solve ho sakti hai. is question me asal me koi rocket science nahi hai, bas hume ye samajhna hai ki hume diya kya ja raha hai aur humse chaha kya ja raha hai. hume ek equations
+ki list di gayi hai jisme har equation me do variables hote hain, jaise [a, b], aur saath me ek values array hota hai. iska simple matlab ye hota hai ki equation ka pehla variable
+doosre variable se divide karne par jo value milti hai, wahi values array me di hui hoti hai, yani a / b = 2. isi tarah agar agla pair [b, c] hai aur value 3 hai, to iska matlab 
+hota hai b / c = 3. ab jab hume itna pata hai, to dimaag apne aap soch leta hai ki agar a / b aur b / c pata hai, to hum bina kisi extra information ke a / c nikaal sakte hain, 
+bas ratio ko aapas me jod kar.
+
+ab queries wali list me bas yahi kaam karna hota hai. har query me do variables hote hain aur hume dekhna hota hai ki kya in dono ke beech koi relation ban pa raha hai ya nahi. 
+agar dono variables kahin na kahin connected hain, to hum unke beech ka ratio nikaal sakte hain. agar koi variable poori equations me kahin aaya hi nahi, to uske baare me kuch 
+pata hi nahi chal sakta, isliye seedha -1 return kar dete hain. agar query me dono variables same hain aur wo variable exist karta hai, to answer hamesha 1 hota hai, kyunki koi
+bhi cheez apne aap se divide ho to result 1 hi aata hai. bas itni si logic hai, isse zyada kuch nahi.
+
+jab hum currency conversion ka example lete hain, to cheez aur zyada clear ho jaati hai. maan lo hume sirf itna pata hai ki ek currency doosri currency ke comparison me kitni value
+rakhti hai. jaise hume directly har currency ka rate har currency ke saath nahi pata hota, balki kuch limited relations hote hain. lekin phir bhi hum conversions kar lete hain, 
+kyunki hum un relations ko jod kar sochte hain. agar hume pata hai ki pehli currency doosri se kitni strong hai, aur doosri teesri se kitni strong hai, to hum bina kisi extra
+information ke pehli aur teesri ke beech ka rate nikaal sakte hain. yahin par direct aur indirect relation ka concept kaam karta hai, jisme hum beech ke steps ka use karke final 
+answer tak pahunchte hain. agar kisi currency ka naam system me kahin registered hi nahi hai, to uske baare me hum kuch bhi calculate nahi kar sakte, isliye system clearly bata 
+deta hai ki conversion possible nahi hai.
+
+sabse pehle humne jo equations di hui thi unko ek structure me store kiya, jisse har variable ke saath uska direct relation pata chal sake. iske liye humne har equation ko dono taraf se 
+store kiya, matlab agar ek variable doosre se divide ho sakta hai to ulta relation bhi store kiya, taaki baad me calculation ek hi direction me limited na rahe.
+
+uske baad humne queries ko ek-ek karke uthaya aur har query ke liye sabse pehle ye check kiya ki jo variables puche ja rahe hain, wo exist bhi karte hain ya nahi. agar koi bhi variable 
+exist nahi karta tha, to humne seedha us query ka answer -1 rakh diya.
+
+agar dono variables same the aur wo system me present the, to humne turant answer 1 return kar diya, kyunki koi bhi cheez apne aap se divide ho to result hamesha 1 hota hai.
+
+jab variables alag the aur dono present the, tab humne ek search start ki, jisme hum ek variable se doosre variable tak connection dhundhne lage. is search ke dauran hum har step par
+value ko multiply karte gaye, taaki final ratio mil sake.
+
+search ke time humne ye bhi dhyaan rakha ki ek hi variable ko baar-baar visit na karein, isliye visited ka use kiya, jisse infinite loop na bane.
+
+jaise hi hume destination variable mil gaya, humne us time tak ka calculated result return kar diya. agar poori search ke baad bhi koi connection nahi mila, to us query ka 
+answer -1 hi rakha gaya.
+ ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+class Solution {
+
+    Map<String, Map<String, Double>> map = new HashMap<>();
+
+    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+
+        // STEP 1: Build graph
+        for (int i = 0; i < equations.size(); i++) {
+            String first = equations.get(i).get(0);
+            String second = equations.get(i).get(1);
+            double val = values[i];
+
+            map.putIfAbsent(first, new HashMap<>());
+            map.putIfAbsent(second, new HashMap<>());
+
+            map.get(first).put(second, val);
+            map.get(second).put(first, 1.0 / val);
+        }
+
+        // STEP 2: Answer queries
+        double[] result = new double[queries.size()];
+
+        for (int j = 0; j < queries.size(); j++) {
+            String src = queries.get(j).get(0);
+            String dest = queries.get(j).get(1);
+
+            if (!map.containsKey(src) || !map.containsKey(dest)) {
+                result[j] = -1.0;
+            } else if (src.equals(dest)) {
+                result[j] = 1.0;
+            } else {
+                Set<String> visited = new HashSet<>();
+                result[j] = dfs(src, dest, 1.0, visited);
+            }
+        }
+
+        return result;
+    }
+
+    private double dfs(String curr, String target, double product, Set<String> visited) {
+
+        if (curr.equals(target)) return product;
+
+        visited.add(curr);
+
+        for (String next : map.get(curr).keySet()) {
+            if (!visited.contains(next)) {
+                double res = dfs(
+                        next,
+                        target,
+                        product * map.get(curr).get(next),
+                        visited
+                );
+                if (res != -1.0) return res;
+            }
+        }
+
+        return -1.0;
+    }
+}
