@@ -1,0 +1,74 @@
+Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array nums = [0,1,2,4,5,6,7] might become:
+
+[4,5,6,7,0,1,2] if it was rotated 4 times.
+[0,1,2,4,5,6,7] if it was rotated 7 times.
+Notice that rotating an array [a[0], a[1], a[2], ..., a[n-1]] 1 time results in the array [a[n-1], a[0], a[1], a[2], ..., a[n-2]].
+
+Given the sorted rotated array nums of unique elements, return the minimum element of this array.
+
+You must write an algorithm that runs in O(log n) time.
+
+ 
+
+Example 1:
+
+Input: nums = [3,4,5,1,2]
+Output: 1
+Explanation: The original array was [1,2,3,4,5] rotated 3 times.
+Example 2:
+
+Input: nums = [4,5,6,7,0,1,2]
+Output: 0
+Explanation: The original array was [0,1,2,4,5,6,7] and it was rotated 4 times.
+Example 3:
+
+Input: nums = [11,13,15,17]
+Output: 11
+Explanation: The original array was [11,13,15,17] and it was rotated 4 times. 
+ 
+
+Constraints:
+
+n == nums.length
+1 <= n <= 5000
+-5000 <= nums[i] <= 5000
+All the integers of nums are unique.
+nums is sorted and rotated between 1 and n times.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Socho ek computer system hai jisme bahut saare programs (processes) run ho rahe hain. Har process ki ek priority number hoti hai, jisse system decide karta hai kaunsa process pehle
+chalega. Shuru me ye processes priority ke order me arranged hote hain, jaise 1, 2, 3, 4, 5, jahan 1 ka matlab sabse zyada important. CPU in processes ko ek-ek karke time deta hai.
+Jab ek process apna time use kar leta hai, to CPU agle process par chala jata hai. Is tarah CPU ka pointer aage badhta rehta hai aur jab last process khatam hota hai to pointer phir
+se shuru me aa jata hai. Is wajah se processes ka order dikhta hai jaise wo ghoom gaya ho. For example, agar CPU abhi priority 3 wale process par hai, to system ko processes is order
+me dikhte hain: 3, 4, 5, 1, 2. Dhyan dene wali baat ye hai ki processes abhi bhi priority ke order me hi hain, bas starting point change ho gaya hai. Ab operating system ko kai baar
+ye jaan-na hota hai ki sabse zyada important process kaunsa hai, yaani priority 1 wala process. Lekin processes ki list bahut badi ho sakti hai, isliye har baar ek-ek process ko check
+karna slow hoga.
+
+Is problem ko solve karne ke liye system beech ke process ko dekhta hai aur last process se compare karta hai.
+Agar beech wala process last wale se kam important ho, to system samajh jata hai ki sabse important process list ke dusre hissa me hai, aur pehla hissa ignore kar deta hai.
+Lekin agar beech wala process last wale se zyada important ho, to system samajh jata hai ki sabse important process isi taraf hai.
+Is tarah har step me aadhi list hata di jaati hai, 
+jab tak ek hi process bacha rahe ( simple apna binary search algorithm hi chalega). Wahi process sabse zyada priority wala hota hai.
+Yehi idea hum rotated sorted array wale problem me use karte hain, jahan bina poori list dekhe, sirf smart comparisons se minimum element nikaal liya jata hai.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    public int findMin(int[] nums) {
+        
+        int left = 0;
+        int right = nums.length - 1;
+
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] > nums[right]) {
+                left = mid + 1;
+            } 
+           
+            else {
+                right = mid;
+            }
+        }
+
+        return nums[left];
+    }
+}
