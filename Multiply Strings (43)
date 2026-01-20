@@ -1,0 +1,158 @@
+Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string.
+
+Note: You must not use any built-in BigInteger library or convert the inputs to integer directly.
+
+Example 1:
+
+Input: num1 = "2", num2 = "3"
+Output: "6"
+Example 2:
+
+Input: num1 = "123", num2 = "456"
+Output: "56088"
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Jab hum ye question pehli baar dekhte hain:
+
+“Given two non-negative integers as strings, return their product as a string”
+
+to almost har bande ke dimaag me ye aata hai:
+
+“Arre simple hai…
+string ko Integer ya Long me parse karo, multiply karo, phir answer ko wapas string bana do. Done 😎”
+
+Jaise:
+
+"123" → 123
+"456" → 456
+123 × 456 = 56088
+"56088"
+
+Lekin problem yahin se start hoti hai.
+
+⚠️ Reality check
+
+Java ka long sirf 19 digits tak number store kar sakta hai.
+Matlab:
+
+9223372036854775807   (19 digits)
+
+Isse zyada bada number aaya to?
+💥 Overflow
+💥 Galat answer
+💥 Program toot gaya
+
+Aur real world me numbers bahut bade hote hain.
+
+Socho:
+
+Bank me crores of transactions
+
+Crypto wallet balances
+
+NASA ke space calculations
+
+Satellite distances
+
+Encryption keys
+
+Yahan numbers 100 digits, 500 digits, 1000 digits ke ho sakte hain.
+
+Isliye industry (NASA, banking systems, crypto engines) numbers ko string form me rakh kar digit by digit calculate karti hai — bilkul waise jaise hum school me paper pe multiply 
+karte the.
+
+Socho tum NASA ya kisi banking software me kaam kar rahe ho. Tumhare system ko do numbers milte hain:
+
+num1 = "123"
+num2 = "456"
+
+Ye numbers string me hain, kyunki real world me ye kabhi "123" nahi balki
+"987654321987654321987654321" jaise ho sakte hain. Java ka long sirf 19 digits sambhal sakta hai, isliye hum inko number me convert hi nahi kar sakte. Agar kiya to system galat
+answer de dega — aur NASA ka rocket galat jagah chala jaayega 🚀😄.
+
+Isliye hum wahi karte hain jo insaan kagaz pe karta hai — digit by digit multiplication.
+
+Tum sabse pehle ek lambi sheet bana lete ho jisme answer likhna hai. Code me ye sheet hoti hai:
+
+int[] result = new int[num1.length() + num2.length()];
+
+
+Kyun?
+Kyunki agar ek number ke n digits aur dusre ke m digits hain, to answer max (n + m) digits ka ho sakta hai not more than that.
+
+Ab tum right side se multiplication shuru karte ho, jaise school me:
+
+Tum "123" aur "456" ke last digits lete ho — '3' aur '6'.
+Character ko digit banane ke liye Java me hum '6' - '0' karte hain, jisse 6 milta hai ye answer hame mila by ASCII because the ASCII value of '6' and '0' is 54 and 48 respectively.
+Fir 3 × 6 = 18 hota hai. Ye 18 tum result array ke last wale position me daalte ho  8 digit aur 1 carry.
+
+Fir next digit '5' se multiply, fir '4' se — aur har baar jo multiplication hota hai usko usi jagah pe add kar dete ho jahan uska place value banta hai.
+Bilkul waise hi jaise:
+
+      123
+   ×  456
+-----------
+      738
+     615
++   492
+-----------
+   56088
+
+
+Bas fark ye hai ki kagaz ki jagah tum result[] array me likh rahe ho.
+
+Jab poora multiplication ho jaata hai, maan lo array ban jaata hai:
+
+[0, 5, 6, 0, 8, 8]
+
+
+Isme starting ka 0 extra hota hai, jo kagaz ke left side ka khali space samjho.
+Ab tumhe final number banana hai, lekin Java me normal String change nahi hoti (immutable hoti hai), isliye hum StringBuilder use karte hain — ye ek aisi string hoti hai jisme hum
+characters jodte ja sakte hain bina nayi string banaye.
+
+Hum result[] me left se right chalte hain, pehle wale zero skip kar dete hain, phir 5,6,0,8,8 ko StringBuilder me jod dete hain.
+
+Aakhir me hume milta hai:
+
+"56088"
+
+Aur yahi hum return kar dete hain.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    public String multiply(String num1, String num2) {
+        int n = num1.length();
+        int m = num2.length();
+
+        if(num1.equals("0") || num2.equals("0"))
+        {
+            return "0";
+        }
+        int[] result = new int[m+n];
+        for(int i = n-1;i>=0;i--)
+        {
+            for(int j = m-1;j>=0;j--)
+            {
+                int a = num1.charAt(i) - '0';
+                int b = num2.charAt(j) - '0';
+
+                int mul = a*b;
+
+                int sum = mul+result[i+j+1];
+                result[i+j+1] = sum%10;
+                result[i+j] += sum/10;
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(int num:result)
+        {
+            if(!(sb.length() == 0 && num == 0))
+            {
+                sb.append(num);
+            } 
+        }
+
+        return sb.length() == 0 ? "0" : sb.toString();
+
+        
+    }
+}

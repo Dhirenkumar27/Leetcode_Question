@@ -1,0 +1,72 @@
+Given two strings s and p, return an array of all the start indices of p's anagrams in s. You may return the answer in any order.
+
+Example 1:
+
+Input: s = "cbaebabacd", p = "abc"
+Output: [0,6]
+Explanation:
+The substring with start index = 0 is "cba", which is an anagram of "abc".
+The substring with start index = 6 is "bac", which is an anagram of "abc".
+Example 2:
+
+Input: s = "abab", p = "ab"
+Output: [0,1,2]
+Explanation:
+The substring with start index = 0 is "ab", which is an anagram of "ab".
+The substring with start index = 1 is "ba", which is an anagram of "ab".
+The substring with start index = 2 is "ab", which is an anagram of "ab".
+ 
+
+Constraints:
+
+1 <= s.length, p.length <= 3 * 104
+s and p consist of lowercase English letters.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Socho ek chat & messaging app like WhatsApp / Instagram DM jahan company ka rule hai ki “bad” jaise kuch words allow nahi hain.
+Problem ye hai ki users smart hote hain like me hahaha wo direct “bad” nahi likhte, balki letters ko shuffle karke likh dete hain, jaise “dab”, “abd”, ya sentence ke beech me “uoy
+era dab”.System ka kaam ye hai ki poore message ke har chhote part (window) ko check kare aur dekhe ki kahin usme banned word ke same letters same count me to nahi aa rahe. Order matter
+nahi karta, bas letters ka count same hona chahiye kyunki anagram bhi rule tod raha hai.
+
+abhi hamare question likewise same hi hai,
+Yahan s = poora user message ("uoy era dab") aur p = banned word ("bad"). Question keh raha hai: message ke andar aise kaun-kaun se start index hain jahan se length p ki substring 
+ek anagram hai p ka?
+
+Is problem ko simple banane ke liye,
+Pehle p string ke har letter ka count ek 26 size ke array me store kar lo (a–z ke liye). Ye hamara reference ho jaata hai.
+Phir s string par p ki length ki sliding window chalao. Window me jo naya character aata hai uska count badhao, aur jo bahar jaata hai uska count ghatao. Har step par window ka
+frequency array p ke frequency array se compare karo. Agar dono same hain, to iska matlab window p ka anagram hai aur uska starting index answer me add kar do.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    public List<Integer> findAnagrams(String s, String p) {
+        List<Integer> list = new ArrayList<>();
+        int[] freqP = new int [26];
+        int[] freqS = new  int[26];
+
+        for(char ch:p.toCharArray())
+        {
+            freqP[ch-'a']++;
+        }
+
+        int left = 0;
+        int right = 0;
+        int lengthOfP = p.length();
+
+        while(right<s.length())
+        {
+            freqS[s.charAt(right)-'a']++;
+            right++;
+
+            if(right-left > lengthOfP)
+            {
+                freqS[s.charAt(left)-'a']--;
+                left++;
+            }
+
+            if(right-left == lengthOfP && Arrays.equals(freqP,freqS))
+            {
+                list.add(left);
+            }
+        }
+        return list;
+    }
+}
