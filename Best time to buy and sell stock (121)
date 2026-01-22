@@ -1,0 +1,56 @@
+You are given an array prices where prices[i] is the price of a given stock on the ith day.
+
+You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+
+Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
+
+ 
+
+Example 1:
+
+Input: prices = [7,1,5,3,6,4]
+Output: 5
+Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.
+Example 2:
+
+Input: prices = [7,6,4,3,1]
+Output: 0
+Explanation: In this case, no transactions are done and the max profit = 0.
+ --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Socho tum har din stock market dekh rahe ho aur tumhara kaam sirf itna hai ki aage badhte rehna hai, peeche mud ke kuch bhi change nahi karna. Tum pehle din ka price dekhte ho aur 
+maan lete ho ki abhi ke liye wahi sabse sasta stock hai, isliye tum min me us price ko store kar lete ho. Saath hi tum ye bhi maan lete ho ki abhi tak koi profit nahi hua, isliye
+maxDiff ko 0 rakhte ho.
+
+Ab jaise-jaise din aage badhte jaate hain, tum har din ka price dekhte ho aur khud se poochte ho ki “kya aaj ka price ab tak ke sabse saste din se bhi kam hai?” Agar haan, to tum 
+apni soch update kar lete ho aur bolte ho ki nahi, ab stock isi din kharidna sabse behtar hota, isliye min ko aaj ke price se update kar dete ho. Matlab tum bas sabse kam buy price
+yaad rakh rahe ho, kuch aur nahi.
+
+Agar aaj ka price sabse sasta nahi hai, to tum turant ye sochne lagte ho ki “agar maine stock us din kharida hota jab price sabse kam tha aur aaj bechta, to mujhe kitna profit hota?” 
+Tum prices[i] - min nikalte ho aur use compare karte ho maxDiff se. Agar aaj ka profit zyada hai, to tum maxDiff ko update kar dete ho. Iska matlab ye hai ki tum har din check kar 
+rahe ho ki aaj sell karke maximum profit mil sakta hai ya nahi.
+
+Is poori journey me tum kabhi future ka guess nahi karte, kabhi peeche jaake buy price change nahi karte. Tum bas minimum price ko store karte jaate ho aur maximum profit calculate 
+karte jaate ho. Jab saare din khatam ho jaate hain, tab maxDiff ke andar wahi answer hota hai jo best possible profit hai.
+ --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    public int maxProfit(int[] prices) {
+        
+        int min = prices[0];
+        int maxDiff = 0;
+
+        for(int i = 1;i<prices.length;i++)
+        {
+            if(prices[i]<prices[i-1] && prices[i]<min)
+            {
+                min = prices[i];
+            }
+            else
+            {
+                maxDiff = Math.max(maxDiff,prices[i]-min);
+            }
+            
+        }
+        return maxDiff;
+    }
+}
