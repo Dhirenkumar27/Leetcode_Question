@@ -1,0 +1,70 @@
+The pair sum of a pair (a,b) is equal to a + b. The maximum pair sum is the largest pair sum in a list of pairs.
+
+For example, if we have pairs (1,5), (2,3), and (4,4), the maximum pair sum would be max(1+5, 2+3, 4+4) = max(6, 5, 8) = 8.
+Given an array nums of even length n, pair up the elements of nums into n / 2 pairs such that:
+
+Each element of nums is in exactly one pair, and
+The maximum pair sum is minimized.
+Return the minimized maximum pair sum after optimally pairing up the elements.
+
+ 
+
+Example 1:
+
+Input: nums = [3,5,2,3]
+Output: 7
+Explanation: The elements can be paired up into pairs (3,3) and (5,2).
+The maximum pair sum is max(3+3, 5+2) = max(6, 7) = 7.
+Example 2:
+
+Input: nums = [3,5,4,2,4,6]
+Output: 8
+Explanation: The elements can be paired up into pairs (3,5), (4,4), and (6,2).
+The maximum pair sum is max(3+5, 4+4, 6+2) = max(8, 8, 8) = 8.
+ 
+
+Constraints:
+
+n == nums.length
+2 <= n <= 105
+n is even.
+1 <= nums[i] <= 105
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+You must pair all numbers (array length is even).
+
+Every number is used exactly once.
+
+For any pairing you choose:
+
+Compute the sum of each pair
+
+Take the maximum of those sums
+
+Among all possible pairings, return the smallest possible maximum
+
+Is question me galti yeh hoti hai ki hum sirf ek pair ka maximum dekh lete hain, jaise [3,5] ka sum 8, aur soch lete hain answer wahi hai. Lekin question yeh nahi pooch raha ki 
+koi ek pair ka maximum kya hai, balki yeh pooch raha hai ki saare elements ko pair karne ke baad jo worst (maximum) pair bachta hai, usko minimum kaise banaya jaaye. Agar hum
+[3,5] bana dete hain, to baaki [2,3] bachta hai, aur final answer hota hai max(8,5) = 8. Lekin agar hum thoda smartly pairing karein—jaise pehle array ko sort karein aur phir 
+sabse chhote ko sabse bade ke saath pair karein—to pairs bante hain [3,3] aur [5,2], jinke sums 6 aur 7 hain, aur ab final answer hota hai max(6,7) = 7
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    public int minPairSum(int[] nums) {
+        Arrays.sort(nums);
+
+        int max = 0;
+        int i = 0;
+        int j = nums.length-1;
+
+        while(i<j)
+        {
+            if(nums[i]+nums[j]>max)
+            {
+                max = nums[i] + nums[j];
+            }
+            i++;
+            j--;
+        }
+        return max;
+    }
+}
