@@ -1,0 +1,63 @@
+You are given an integer array nums consisting of n elements, and an integer k.
+
+Find a contiguous subarray whose length is equal to k that has the maximum average value and return this value. Any answer with a calculation error less than 10-5 will be accepted.
+
+ 
+
+Example 1:
+
+Input: nums = [1,12,-5,-6,50,3], k = 4
+Output: 12.75000
+Explanation: Maximum average is (12 - 5 - 6 + 50) / 4 = 51 / 4 = 12.75
+Example 2:
+
+Input: nums = [5], k = 1
+Output: 5.00000
+ 
+
+Constraints:
+
+n == nums.length
+1 <= k <= n <= 105
+-104 <= nums[i] <= 104
+ 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Is question me hume fixed length k ki contiguous subarray ka maximum average nikalna hota hai. Iske liye hum sliding window technique use karte hain. Sabse pehle hum starting ke 
+k elements ka sum nikal lete hain aur isi sum ko initial maximum maan lete hain. Ab hum ek window imagine karte hain jo array par aage slide karti hai. Har step par jo element 
+window ke left side se bahar jaata hai usko sum me se minus kar dete hain aur jo naya element right side se window me aata hai usko sum me add kar dete hain. Is tarah bina poora
+sum dobara calculate kiye, hum efficiently har possible subarray ka sum nikal lete hain. Har step par hum check karte hain ki current sum pehle ke maximum sum se bada hai ya nahi,
+aur agar bada ho to maximum update kar dete hain. Aakhir me jab sari windows check ho jaati hain, to maximum sum ko k se divide karke hume required maximum average mil jaata hai
+
+story aur code alah hai story me maximum se pahele find kiya and last me direct k se divide karke ans but code me maine har step par check kiya avergae se hi dekha har step par 
+divide karke dekha both are same 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    public double findMaxAverage(int[] nums, int k) {
+        
+        int n = nums.length;
+        double maxAvg = Double.MIN_VALUE;
+        double sum = nums[0];
+        for(int i = 1;i<k;i++)
+        {
+            sum+=nums[i];
+        }
+        maxAvg = sum/k;
+        int j = 0;
+        int l = k;
+
+        while(l<n)
+        {
+            sum-=nums[j];
+            sum+=nums[l];
+            j++;
+            l++;
+            if((sum/k) > maxAvg)
+            {
+                maxAvg = sum/k;
+            }
+        }
+        return maxAvg;
+
+    }
+}
