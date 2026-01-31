@@ -1,0 +1,115 @@
+Given a string s and an integer k, return the maximum number of vowel letters in any substring of s with length k.
+
+Vowel letters in English are 'a', 'e', 'i', 'o', and 'u'.
+
+ 
+
+Example 1:
+
+Input: s = "abciiidef", k = 3
+Output: 3
+Explanation: The substring "iii" contains 3 vowel letters.
+Example 2:
+
+Input: s = "aeiou", k = 2
+Output: 2
+Explanation: Any substring of length 2 contains 2 vowels.
+Example 3:
+
+Input: s = "leetcode", k = 3
+Output: 2
+Explanation: "lee", "eet" and "ode" contain 2 vowels.
+ 
+
+Constraints:
+
+1 <= s.length <= 105
+s consists of lowercase English letters.
+1 <= k <= s.length
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Imagine you are reading a word from left to right. Your teacher tells you to look at exactly k letters at a time and find which group has the most vowels. First, you take the first k 
+letters of the word and count how many vowels are in them. This becomes your first score. Then, instead of counting everything again, you move the group one letter forward. If the 
+letter that goes out was a vowel, you subtract one from the score. If the new letter that comes in is a vowel, you add one to the score. Each time, you compare the current score with
+the best score you have seen so far and keep the bigger one. In the end, you know which group of k letters contains the most vowels.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+class Solution {
+    public int maxVowels(String s, int k) {
+        int maxAns = 0;
+        int temp = 0;
+        char[] arr = s.toCharArray();
+        for(int i = 0;i<k;i++)
+        {
+            if(arr[i] == 'a' || arr[i] == 'e' || arr[i] == 'i' || arr[i] == 'o' || arr[i] == 'u')
+            {
+                temp+=1;
+            }
+        }
+
+        maxAns = temp;
+        int i = k;
+        int j = 0;
+
+        while(i<arr.length)
+        {
+            if(arr[i] == 'a' || arr[i] == 'e' || arr[i] == 'i' || arr[i] == 'o' || arr[i] == 'u' )
+            {
+                temp+=1;
+            }
+
+            if(arr[j] == 'a' || arr[j] == 'e' || arr[j] == 'i' || arr[j] == 'o' || arr[j] == 'u')
+            {
+                temp-=1;
+            }
+
+            maxAns = Math.max(temp,maxAns);
+            i++;
+            j++;
+        }
+        return maxAns;
+    }
+}
+
+
+
+-----------------------------------
+without creating charactar array
+
+class Solution {
+    public int maxVowels(String s, int k) {
+        int maxAns = 0;
+        int temp = 0;
+
+        // first window
+        for (int i = 0; i < k; i++) {
+            if (isVowel(s.charAt(i))) {
+                temp++;
+            }
+        }
+
+        maxAns = temp;
+        int i = k;
+        int j = 0;
+
+        // sliding window
+        while (i < s.length()) {
+            if (isVowel(s.charAt(i))) {
+                temp++;
+            }
+
+            if (isVowel(s.charAt(j))) {
+                temp--;
+            }
+
+            maxAns = Math.max(maxAns, temp);
+            i++;
+            j++;
+        }
+
+        return maxAns;
+    }
+
+    private boolean isVowel(char c) {
+        return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+    }
+}
