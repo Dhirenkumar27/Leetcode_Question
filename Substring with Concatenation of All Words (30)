@@ -1,0 +1,131 @@
+You are given a string s and an array of strings words. All the strings of words are of the same length.
+
+A concatenated string is a string that exactly contains all the strings of any permutation of words concatenated.
+
+For example, if words = ["ab","cd","ef"], then "abcdef", "abefcd", "cdabef", "cdefab", "efabcd", and "efcdab" are all concatenated strings. "acdbef" is not a concatenated string because it is not the concatenation of any permutation of words.
+Return an array of the starting indices of all the concatenated substrings in s. You can return the answer in any order.
+
+ 
+
+Example 1:
+
+Input: s = "barfoothefoobarman", words = ["foo","bar"]
+
+Output: [0,9]
+
+Explanation:
+
+The substring starting at 0 is "barfoo". It is the concatenation of ["bar","foo"] which is a permutation of words.
+The substring starting at 9 is "foobar". It is the concatenation of ["foo","bar"] which is a permutation of words.
+
+Example 2:
+
+Input: s = "wordgoodgoodgoodbestword", words = ["word","good","best","word"]
+
+Output: []
+
+Explanation:
+
+There is no concatenated substring.
+
+Example 3:
+
+Input: s = "barfoofoobarthefoobarman", words = ["bar","foo","the"]
+
+Output: [6,9,12]
+
+Explanation:
+
+The substring starting at 6 is "foobarthe". It is the concatenation of ["foo","bar","the"].
+The substring starting at 9 is "barthefoo". It is the concatenation of ["bar","the","foo"].
+The substring starting at 12 is "thefoobar". It is the concatenation of ["the","foo","bar"].
+
+ 
+
+Constraints:
+
+1 <= s.length <= 104
+1 <= words.length <= 5000
+1 <= words[i].length <= 30
+s and words[i] consist of lowercase English letters.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Sabse pehle jo thought aata hai wo ye hai ki words array ke saare words same length ke hain. Ye bahut badi hint hai. Iska matlab ye hua ki jo bhi valid substring hogi s ke andar, 
+wo random length ki nahi hogi. Uski length fixed hogi. Agar ek word ki length L hai aur total N words hain, to jo substring hume chahiye uski length hamesha L × N hi hogi. Isse 
+hume ek fixed size window mil jaati hai. Matlab hume poori string ke har index se random try karne ki zarurat hi nahi, bas un windows ko check karna hai jo is fixed length ki ho
+sakti hain.
+
+Sabse pehle hum words array ka HashMap (WordsMap) banate hain, aur ye poore solution ka rule book hota hai. Is map ka kaam sirf ek hai: hume batana ki kaunsa word kitni baar allowed
+hai. Matlab agar words = ["foo","bar","foo"] hai, to map me "foo" → 2 aur "bar" → 1 store hota hai. Ye map kabhi change nahi hota, poore code me ye ek constant reference ki tarah 
+kaam karta hai. Har window ko isi map ke rules follow karne hote hain.
+
+Ab agla thought aata hai ki hum string ko character by character nahi, balki word by word dekh rahe hain. Kyunki agar ek word 3 characters ka hai, to substring ko bhi 3–3 ke blocks
+me tod ke hi check karna padega. Isi wajah se hum sliding window ko right++ se nahi, balki right += wordLength se move karte hain. Yani har jump ek poora word skip karta hai, half
+word nahi. Ye hi reason hai ki solution fast rehta hai.
+
+Ab sabse confusing part aata hai — bahar wala for (i = 0; i < wordLength) loop. Ye isliye hai kyunki valid concatenation sirf ek hi alignment se start nahi hoti. Socho word length 
+3 hai. To ek valid answer index 0 se bhi start ho sakta hai, index 1 se bhi, aur index 2 se bhi. Agar hum sirf index 0 se sliding window chalayenge, to index 1 aur 2 se start hone 
+wale valid answers hum miss kar denge. Isliye hum string ko wordLength alag-alag tracks me tod dete hain, aur har track pe ek independent sliding window chalate hain.
+
+Ab inner loop me right pointer ka kaam simple hai — wo window ko expand karta hai. Har baar wo ek naya word uthata hai aur check karta hai ki kya ye word words array ka part hai ya 
+nahi. Agar word valid hai, to hum uska count window map me badhate hain aur count++ kar dete hain, matlab ek aur valid word window me aa gaya.
+
+Lekin yahin pe ek important problem aa sakti hai — ho sakta hai koi word allowed limit se zyada baar aa jaaye. Jaise words = ["foo","bar"] hai aur window me "foo","foo" aa gaya. 
+Is case me window invalid ho jaati hai. Isi problem ko handle karne ke liye andar wala while loop hai. Ye loop window ko left se shrink karta hai jab tak extra word nikal na jaaye.
+Har shrink me left pointer aage badhta hai aur us word ka count kam hota hai. Ye loop ensure karta hai ki window hamesha valid state me rahe.
+
+Jab kisi point par count == wordsLength ho jaata hai, iska matlab ye hua ki window ke andar exactly utne hi words hain jitne hume chahiye, aur har word required frequency me hai. 
+Bas wahi moment hota hai jab hum left index ko answer me add kar dete hain. Kyunki wahi se ek perfect concatenation start ho rahi hoti hai.
+
+Agar kabhi right pointer ko aisa word mil jaata hai jo words array me hi nahi hai, to iska matlab hai ki current window ka koi future nahi. Us case me hum window reset kar dete
+hain — map clear, count zero, aur left ko next possible position pe le jaate hain. Phir naya fresh window start hota hai.
+
+End me, jab saare alignments aur saare windows check ho jaate hain, to hume exactly wahi indices mil jaate hain jahan se words ke saare permutations continuous form me appear ho 
+rahe hote hain.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class Solution {
+    public List<Integer> findSubstring(String s, String[] words) {
+
+        List<Integer> result = new ArrayList<>();
+
+        int wordsLength = words.length;
+        int singleWordLength = words[0].length();
+
+        HashMap<String, Integer> Wordsmap = new HashMap<>();
+        for (String a : words) {
+            Wordsmap.put(a, Wordsmap.getOrDefault(a, 0) + 1);
+        }
+
+        for (int i = 0; i < singleWordLength; i++) {
+            int count = 0;
+            HashMap<String, Integer> window = new HashMap<>();
+            int left = i;
+
+            for (int right = i; right + singleWordLength <= s.length(); right += singleWordLength) {
+                String word = s.substring(right, right + singleWordLength);
+
+                if (Wordsmap.containsKey(word)) {
+                    window.put(word, window.getOrDefault(word, 0) + 1);
+                    count++;
+
+                    while (window.get(word) > Wordsmap.get(word)) {
+                        String leftWord = s.substring(left, left + singleWordLength);
+                        window.put(leftWord, window.get(leftWord) - 1);
+                        left += singleWordLength;  
+                        count--;
+                    }
+
+                    if (count == wordsLength) {
+                        result.add(left);
+                    }
+
+                } else {
+                    window.clear();
+                    count = 0;
+                    left = right + singleWordLength;
+                }
+            }
+        }
+        return result;
+    }
+}
