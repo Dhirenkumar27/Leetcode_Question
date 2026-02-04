@@ -1,0 +1,218 @@
+Given an encoded string, return its decoded string.
+
+The encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times. Note that k is guaranteed to be a positive integer.
+
+You may assume that the input string is always valid; there are no extra white spaces, square brackets are well-formed, etc. Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, k. For example, there will not be input like 3a or 2[4].
+
+The test cases are generated so that the length of the output will never exceed 105.
+
+ 
+
+Example 1:
+
+Input: s = "3[a]2[bc]"
+Output: "aaabcbc"
+Example 2:
+
+Input: s = "3[a2[c]]"
+Output: "accaccacc"
+Example 3:
+
+Input: s = "2[abc]3[cd]ef"
+Output: "abcabccdcdcdef"
+ 
+
+Constraints:
+
+1 <= s.length <= 30
+s consists of lowercase English letters, digits, and square brackets '[]'.
+s is guaranteed to be a valid input.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1️⃣ Data Compression & Storage
+
+In real systems, data is often stored in a compressed form to save space.
+
+Example:
+
+10[a]
+
+
+instead of
+
+aaaaaaaaaa
+
+
+This is used in:
+
+File compression tools
+
+Log storage systems
+
+Network data transfer
+
+Before using the data, the system must decode it — exactly what this problem does.
+
+2️⃣ Parsing Nested Structures (Very Common)
+
+Look at:
+
+3[a2[c]]
+
+
+This is a nested structure.
+
+Real-world examples:
+
+HTML / XML parsing
+
+JSON parsing
+
+Programming language interpreters
+
+Example:
+
+<div>
+  <div>
+    <p>text</p>
+  </div>
+</div>
+
+
+All of these require:
+
+Understanding nested brackets
+
+Processing inner content first
+
+Using a stack
+
+Same thinking as this problem.
+
+3️⃣ Template Engines (Backend & Frontend)
+
+In backend systems, templates often contain repeated blocks.
+
+Example (pseudo-template):
+
+3[<li>{{item}}</li>]
+
+
+The system must:
+
+Read the number
+
+Decode the block
+
+Repeat it correctly
+
+Exactly this logic.
+
+4️⃣ Macro Expansion / Code Generation
+
+In compilers or build tools:
+
+5[LOAD X]
+
+
+Expands to:
+
+LOAD X
+LOAD X
+LOAD X
+LOAD X
+LOAD X
+
+
+Used in:
+
+Assembly macros
+
+Code generators
+
+DSLs (Domain Specific Languages)
+
+5️⃣ Network Protocols & Messaging
+
+Some protocols use compact encoding to reduce message size.
+
+Before processing:
+
+The message is decoded
+
+Nested instructions are expanded
+
+Same stack-based decoding.
+=========================
+eg . 3[a2[c]]
+
+Socho tum ek encoded string ko left se right padh rahe ho. Tumhe pata hai ki jab bhi koi number aata hai, wo ye batata hai ki aage aane wali string kitni baar repeat hogi.
+Isliye jaise hi tumhe koi digit dikhta hai, tum usko ek variable k me save kar lete ho. Agar number bada ho (jaise 12), to tum usko tod-tod ke nahi, balki poora number bana 
+ke k me rakhte ho.
+
+Ab jaise hi tumhe opening bracket [ milta hai, tum turant samajh jaate ho ki ab ek nayi chhoti string start hone wali hai (for eg. current me 'a' tha naya opening bracket 'c' ke liye ), 
+jo baad me repeat hogi. Lekin usse pehle ek kaam bahut zaroori hai — jo string tum abhi tak bana rahe the (current string), usko tum side me safe rakh dete ho, kyunki ab tum uske 
+andar ek nested string banane ja rahe ho. Isliye tum do stacks use karte ho:
+ek stack me k (repeat count) ko save karte ho, aur dusre stack me current string ko save kar dete ho. Phir current string ko fresh bana dete ho, taaki nayi nested string clean start
+ho sake.
+
+Ab tum brackets ke andar ke characters ko padhte jaate ho. Agar letters milte hain, to tum unhe current string me jodte jaate ho. Agar andar phir se number aur [ aa jaaye, to wahi 
+process dobara hota hai — number save, current string stack me push, aur ek aur deeper level ki string start. Is tarah nesting jitni deep hoti jaati hai, stacks utni hi kaam aati
+jaati hain.
+
+Ab jab tumhe closing bracket ] milta hai, to tumhe pata chal jaata hai ki ek complete encoded block khatam ho gaya hai. Ab tum stack se sabse upar wala number nikaalte ho, jo batata
+hai ki current string ko kitni baar repeat karna hai. Saath hi tum stack se wo purani string bhi nikaalte ho jo tumne [ ke time save ki thi. Ab tum current string ko utni baar repeat
+karke us purani string ke end me jod dete ho. Iske baad ye combined string hi nayi current string ban jaati hai.
+
+Tum ye process poori string ke end tak repeat karte rehte ho. Har [ pe state save hoti hai, har ] pe state resolve hoti hai. Aur kyunki stack last in, first out hota hai, isliye
+sabse andar wali string pehle solve hoti hai — bilkul waise hi jaise hume nested encoding me chahiye.
+
+Aakhir me, jab poori string process ho jaati hai aur stacks empty ho jaate hain, jo current string bachi hoti hai wahi final decoded string hoti hai. 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+class Solution {
+    public String decodeString(String s) {
+
+        Stack<Integer> numStack = new Stack<>();
+        Stack<StringBuilder> charStack = new Stack<>();
+
+        StringBuilder currString = new StringBuilder();
+        int k = 0;
+
+        for(char ch:s.toCharArray())
+        {
+            if(Character.isDigit(ch))
+            {
+                k = k*10 + (ch - '0');
+            }
+
+            else if(ch == '[')
+            {
+                numStack.push(k);
+                charStack.push(currString);
+                currString = new StringBuilder();
+                k = 0;
+            }
+
+            else if(ch == ']')
+            {
+                StringBuilder prevChar = charStack.pop();
+                int repeatCurrentChar = numStack.pop();
+
+                for(int i = 0;i<repeatCurrentChar;i++)
+                {
+                    prevChar.append(currString);
+                }
+
+                currString = prevChar;
+            }
+
+            else
+            {
+                currString.append(ch);
+            }
+
+
+        }
+        return currString.toString();
+    }
+}
