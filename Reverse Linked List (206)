@@ -1,0 +1,65 @@
+Given the head of a singly linked list, reverse the list, and return the reversed list.
+
+ 
+
+Example 1:
+
+
+Input: head = [1,2,3,4,5]
+Output: [5,4,3,2,1]
+Example 2:
+
+
+Input: head = [1,2]
+Output: [2,1]
+Example 3:
+
+Input: head = []
+Output: []
+ 
+
+Constraints:
+
+The number of nodes in the list is the range [0, 5000].
+-5000 <= Node.val <= 5000
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+A singly linked list is a structure where each node has two things: some data and a reference to the next node. The first node is called the head, and the last node points to null. 
+Normally, the arrows in a linked list go forward, like
+1 → 2 → 3 → 4 → null.
+
+Now we want to reverse the linked list without creating a new one. This means we have to change the direction of the arrows so that they point backward. At first, this looks easy, 
+but it can be dangerous. If we directly change the next of a node to null, we might lose the rest of the list, because we will not know where the next nodes are.
+
+So, before changing any arrow, we first save the next node in a temporary variable. This keeps the remaining list safe. Then we change the current node’s next to point to the previous
+node. After that, we move our pointers one step forward and repeat the same process for the next node.
+
+We keep doing this until we reach the end of the list. When we are done, the pointer that was keeping track of the previous node becomes the new head of the reversed list. In this way,
+we reverse the linked list safely, without using extra memory and without losing any nodes.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        
+        ListNode prev = null;
+        ListNode curr = head;
+
+        while (curr != null) {
+            ListNode nextNode = curr.next; // step 1: save next
+            curr.next = prev;              // step 2: reverse link
+            prev = curr;                   // step 3: move prev
+            curr = nextNode;               // step 4: move curr
+        }
+
+        return prev; 
+    }
+}
